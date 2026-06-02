@@ -1,18 +1,18 @@
 const express = require('express');
 const cors = require('cors');
-const { createClient } = require('@supabase/supabase-js');
-
+const path = require('path');
 const app = express();
+
 app.use(cors());
 app.use(express.json());
-const path = require('path');
+
+// Раздача статических файлов из папки public
 app.use(express.static(path.join(__dirname, 'public')));
-const path = require('path');
+
+// Обработка главной страницы
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
-
-// === НАСТРОЙКА СВЯЗИ С БАЗОЙ ДАННЫХ ===
 // ЗАМЕНИ ТЕКСТ В КАВЫЧКАХ НА СВОИ ДАННЫЕ ИЗ БЛОКНОТА:
 const SUPABASE_URL = 'https://jebpqlinnznogoaktsov.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImplYnBxbGlubnpub2dvYWt0c292Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0MTM5NTYsImV4cCI6MjA5NTk4OTk1Nn0.AXAqko8wZwjYZXhWt50hmaNzQJionZbtdygNZlntRpo';
