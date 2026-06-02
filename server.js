@@ -1,14 +1,22 @@
 const express = require('express');
 const cors = require('cors');
-const path = require('path'); // Оставь только одну такую строчку!
+const path = require('path');
 const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public'));
 
+// Эта строка говорит серверу искать все файлы (картинки, css, html) в папке 'public'
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Эта строка принудительно открывает index.html при заходе на главную
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });
 // ЗАМЕНИ ТЕКСТ В КАВЫЧКАХ НА СВОИ ДАННЫЕ ИЗ БЛОКНОТА:
 const SUPABASE_URL = 'https://jebpqlinnznogoaktsov.supabase.co';
