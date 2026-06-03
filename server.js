@@ -9,7 +9,6 @@ app.use(express.json());
 
 // Инициализация Supabase (использует переменные из настроек Render)
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
-
 app.use(express.static(path.join(__dirname, 'public')));
 
 // API для получения товаров
