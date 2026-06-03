@@ -1,0 +1,14 @@
+[
+  {
+    "id": 1,
+    "name": "Telegram Premium 1 месяц",
+    "price": 350,
+    "image": "https://placehold.co/300"
+  },
+  {
+    "id": 2,
+    "name": "Brawl Stars 30 Гемов",
+    "price": 190,
+    "image": "https://placehold.co/300"
+  }
+]
