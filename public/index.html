@@ -1,177 +1,33 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GamerDrop Market</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: var(--tg-theme-bg-color, #1a1a1a);
-            color: var(--tg-theme-text-color, #ffffff);
-            margin: 0;
-            padding: 15px;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .header h1 {
-            font-size: 24px;
-            color: var(--tg-theme-button-color, #0088cc);
-            margin: 0;
-        }
-        .products-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-        .product-card {
-            background: var(--tg-theme-secondary-bg-color, #2b2b2b);
-            border-radius: 12px;
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        .product-title {
-            font-weight: bold;
-            font-size: 16px;
-            margin-bottom: 5px;
-        }
-        .product-price {
-            color: var(--tg-theme-button-color, #0088cc);
-            font-weight: bold;
-            margin-top: 10px;
-        }
-        .buy-btn {
-            background-color: var(--tg-theme-button-color, #0088cc);
-            color: var(--tg-theme-button-text-color, #ffffff);
-            border: none;
-            border-radius: 8px;
-            padding: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 5px;
-        }
-        .no-products {
-            grid-column: span 2;
-            text-align: center;
-            color: #888;
-            padding: 20px;
-        }
-    </style>
-</head>
-<body>
+async function loadProducts() {
+    const container = document.getElementById('products-container');
+    try {
+        // Запрос идет прямо к твоему серверу
+        const response = await fetch('/products');
+        const products = await response.json();
 
-    <div class="header">
-        <h1>GamerDrop Market</h1>
-        <div style="font-size: 12px; color: #888; margin-top: 5px;">Лучшие игровые товары</div>
-    </div>
-
-    <div class="products-grid" id="products-container">
-        <div class="no-products">Загрузка товаров...</div>
-    </div>
-
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-
-        async function loadProducts() {
-            try {
-                // Запрос идет прямо к твоему серверу
-                const response = await fetch('/products');
-                const products = await response.json();
-                const container = document.getElementById('products-container');
-                
-                if (!products || products.length === 0) {
-                    container.innerHTML = '<div class="no-products">Магазин пока пуст. Добавьте товары в Supabase!</div>';
-                    return;
-                }
-
-                container.innerHTML = '';
-                products.forEach(product => {
-                    const card = document.createElement('div');
-                    card.className = 'product-card';
-                    card.innerHTML = `
-                        <div>
-                            <div class="product-title">${product.title || product.name}</div>
-                            <div style="font-size: 12px; color: #aaa;">${product.description || ''}</div>
-                        </div>
-                        <div>
-                            <div class="product-price">${product.price} ₽</div>
-                            <button class="buy-btn" onclick="buyProduct('${product.id}', '${product.title || product.name}')">Купить</button>
-                        </div>
-                    `;
-                    container.appendChild(card);
-                });
-            } catch (error) {
-                console.error("Ошибка:", error);
-                document.getElementById('products-container').innerHTML = '<div class="no-products">Ошибка загрузки товаров.</div>';
-            }
+        if (!products || products.length === 0) {
+            container.innerHTML = '<div class="no-products">Магазин пуст</div>';
+            return;
         }
 
-        function buyProduct(id, name) {
-            tg.showPopup({
-                title: 'Покупка',
-                message: `Вы хотите купить ${name}?`,
-                buttons: [{id: 'buy', type: 'default', text: 'Да'}, {type: 'cancel', text: 'Отмена'}]
-            });
-        }
-
-        loadProducts();
-        // Функция обработки клика по кнопке "Купить"
-function buyProduct(id, name, price) {
-    if (window.Telegram && window.Telegram.WebApp) {
-        const tg = window.Telegram.WebApp;
-        // ... здесь заканчивается твоя функция loadProducts() ...
-    } catch (error) {
-        console.error(error);
-    }
-} // <--- Это закрывающая скобка функции loadProducts
-
-// ПРЯМО СЮДА ВСТАВЛЯЙ ЭТОТ КОД:
-function buyProduct(id, name, price) {
-    if (window.Telegram && window.Telegram.WebApp) {
-        const tg = window.Telegram.WebApp;
-        
-        tg.showPopup({
-            title: 'Оформление заказа',
-            message: `Вы хотите купить ${name} за ${price} ₽?`,
-            buttons: [
-                {id: 'buy', type: 'default', text: 'Купить'},
-                {id: 'cancel', type: 'cancel', text: 'Отмена'}
-            ]
-        }, (buttonId) => {
-            if (buttonId === 'buy') {
-                tg.sendData(JSON.stringify({ action: 'buy', productId: id }));
-                alert('Запрос отправлен в бот!');
-            }
+        container.innerHTML = '';
+        products.forEach(product => {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.innerHTML = `
+                <h3>${product.title}</h3>
+                <p>${product.description || ''}</p>
+                <div class="price">${product.price} ₽</div>
+            `;
+            container.appendChild(card);
         });
-    } else {
-        alert(`Покупка: ${name} за ${price} ₽. Открой маркет внутри Telegram!`);
+    } catch (err) {
+        console.error("Ошибка во фронтенде:", err);
+        if (container) {
+            container.innerHTML = '<div class="error">Не удалось загрузить товары</div>';
+        }
     }
 }
-        
-        tg.showPopup({
-            title: 'Оформление заказа',
-            message: `Вы хотите купить ${name} за ${price} ₽?`,
-            buttons: [
-                {id: 'buy', type: 'default', text: 'Купить'},
-                {id: 'cancel', type: 'cancel', text: 'Отмена'}
-            ]
-        }, (buttonId) => {
-            if (buttonId === 'buy') {
-                tg.sendData(JSON.stringify({ action: 'buy', productId: id }));
-                alert('Запрос отправлен в бот!');
-            }
-        });
-    } else {
-        alert(`Покупка: ${name} за ${price} ₽. Открой сайт внутри Telegram!`);
-    }
-}
-    </script>
-</body>
-</html>
+
+// Запускаем функцию при загрузке страницы
+document.addEventListener('DOMContentLoaded', loadProducts);
