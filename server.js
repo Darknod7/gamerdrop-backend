@@ -1,29 +1,42 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const fs = require('fs');
+const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// 1. Раздаем статические файлы (HTML, CSS, JS) из папки public
+// Инициализируем базу данных Supabase с помощью ключей из Render
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+// Раздаем статические файлы фронтенда из папки public
 app.use(express.static(path.join(__dirname, 'public')));
 
-// 2. Роут для отдачи товаров из локального файла products.json
-app.get('/products', (req, res) => {
+// Роут для получения товаров прямо из Supabase
+app.get('/products', async (req, res) => {
     try {
-        const filePath = path.join(__dirname, 'products.json');
-        const data = fs.readFileSync(filePath, 'utf8');
-        res.json(JSON.parse(data));
+        // Делаем запрос к таблице 'products'
+        const { data, error } = await supabase
+            .from('products')
+            .select('*');
+
+        if (error) {
+            throw error;
+        }
+
+        // Отправляем массив товаров на фронтенд
+        res.json(data);
     } catch (err) {
-        console.error("Ошибка чтения локального файла товаров:", err);
-        res.status(500).json({ error: "Не удалось загрузить товары" });
+        console.error("Ошибка получения товаров из Supabase:", err);
+        res.status(500).json({ error: "Не удалось загрузить товары из базы данных" });
     }
 });
 
-// 3. Универсальный перехватчик для открытия сайта (работает в Express 4 и 5)
-app.use((req, res) => {
+// Перехватчик для корректной работы путей и страниц
+app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
