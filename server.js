@@ -7,10 +7,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Отдаем статические файлы из папки public
+// Раздаем статические файлы (HTML, CSS, JS) из папки public
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Роут, который возвращает товары из файлика products.json
+// Роут для отдачи товаров из локального файла products.json
 app.get('/products', (req, res) => {
     try {
         const filePath = path.join(__dirname, 'products.json');
@@ -22,7 +22,7 @@ app.get('/products', (req, res) => {
     }
 });
 
-// Все остальные запросы отправляют index.html
+// Правильный главный роут, который не уронит сервер
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
