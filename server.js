@@ -7,18 +7,17 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Инициализируем базу данных Supabase с помощью ключей из Render
+// Инициализируем базу данных Supabase
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Раздаем статические файлы фронтенда из папки public
+// 1. Раздаем статические файлы фронтенда из папки public
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Роут для получения товаров прямо из Supabase
+// 2. Роут для получения товаров из Supabase
 app.get('/products', async (req, res) => {
     try {
-        // Делаем запрос к таблице 'products'
         const { data, error } = await supabase
             .from('products')
             .select('*');
@@ -27,16 +26,16 @@ app.get('/products', async (req, res) => {
             throw error;
         }
 
-        // Отправляем массив товаров на фронтенд
         res.json(data);
     } catch (err) {
         console.error("Ошибка получения товаров из Supabase:", err);
-        res.status(500).json({ error: "Не удалось загрузить товары из базы данных" });
+        res.status(500).json({ error: "Не удалось загрузить товары" });
     }
 });
 
-// Перехватчик для корректной работы путей и страниц
-app.get('(.*)', (req, res) => {
+// 3. НЕУБИВАЕМЫЙ перехватчик для Express 5 (без звездочек и скобок)
+// Он просто берет любой запрос, который не дошел до /products, и открывает твой сайт
+app.use((req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
