@@ -7,21 +7,23 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Отдаем статические файлы из папки public
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Получаем товары напрямую из файла products.json
+// Роут, который возвращает товары из файлика products.json
 app.get('/products', (req, res) => {
     try {
         const filePath = path.join(__dirname, 'products.json');
         const data = fs.readFileSync(filePath, 'utf8');
         res.json(JSON.parse(data));
     } catch (err) {
-        console.error("Ошибка чтения файла:", err);
+        console.error("Ошибка чтения файла товаров:", err);
         res.status(500).json({ error: "Не удалось загрузить товары" });
     }
 });
 
-app.get('/', (req, res) => {
+// Все остальные запросы отправляют index.html
+app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 

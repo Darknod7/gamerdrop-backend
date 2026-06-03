@@ -122,6 +122,28 @@
         }
 
         loadProducts();
+        // Функция обработки клика по кнопке "Купить"
+function buyProduct(id, name, price) {
+    if (window.Telegram && window.Telegram.WebApp) {
+        const tg = window.Telegram.WebApp;
+        
+        tg.showPopup({
+            title: 'Оформление заказа',
+            message: `Вы хотите купить ${name} за ${price} ₽?`,
+            buttons: [
+                {id: 'buy', type: 'default', text: 'Купить'},
+                {id: 'cancel', type: 'cancel', text: 'Отмена'}
+            ]
+        }, (buttonId) => {
+            if (buttonId === 'buy') {
+                tg.sendData(JSON.stringify({ action: 'buy', productId: id }));
+                alert('Запрос отправлен в бот!');
+            }
+        });
+    } else {
+        alert(`Покупка: ${name} за ${price} ₽. Открой сайт внутри Telegram!`);
+    }
+}
     </script>
 </body>
 </html>
