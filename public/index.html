@@ -1,33 +1,83 @@
-async function loadProducts() {
-    const container = document.getElementById('products-container');
-    try {
-        // Запрос идет прямо к твоему серверу
-        const response = await fetch('/products');
-        const products = await response.json();
-
-        if (!products || products.length === 0) {
-            container.innerHTML = '<div class="no-products">Магазин пуст</div>';
-            return;
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GamerDrop Market</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
+        h1 { color: #00a2ff; margin-top: 50px; }
+        #products-container {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .product-card {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            width: 250px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .price {
+            font-weight: bold;
+            color: #00ff88;
+            font-size: 1.2em;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
 
-        container.innerHTML = '';
-        products.forEach(product => {
-            const card = document.createElement('div');
-            card.className = 'product-card';
-            card.innerHTML = `
-                <h3>${product.title}</h3>
-                <p>${product.description || ''}</p>
-                <div class="price">${product.price} ₽</div>
-            `;
-            container.appendChild(card);
-        });
-    } catch (err) {
-        console.error("Ошибка во фронтенде:", err);
-        if (container) {
-            container.innerHTML = '<div class="error">Не удалось загрузить товары</div>';
+    <h1>GamerDrop Market</h1>
+    <p>Лучшие игровые товары</p>
+    
+    <div id="products-container">Загрузка товаров...</div>
+
+    <script>
+    async function loadProducts() {
+        const container = document.getElementById('products-container');
+        try {
+            const response = await fetch('/products');
+            const products = await response.json();
+
+            if (!products || products.length === 0) {
+                container.innerHTML = '<div class="no-products">Магазин пуст</div>';
+                return;
+            }
+
+            container.innerHTML = '';
+            products.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.innerHTML = `
+                    <h3>${product.title}</h3>
+                    <p>${product.description || ''}</p>
+                    <div class="price">${product.price} ₽</div>
+                `;
+                container.appendChild(card);
+            });
+        } catch (err) {
+            console.error("Ошибка во фронтенде:", err);
+            if (container) {
+                container.innerHTML = '<div class="error">Не удалось загрузить товары</div>';
+            }
         }
     }
-}
-
-// Запускаем функцию при загрузке страницы
-document.addEventListener('DOMContentLoaded', loadProducts);
+    document.addEventListener('DOMContentLoaded', loadProducts);
+    </script>
+</body>
+</html>
